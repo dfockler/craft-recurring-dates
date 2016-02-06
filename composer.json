@@ -1,5 +1,5 @@
 {
     "require": {
-        "simshaun/recurr": "dev-master"
+        "simshaun/recurr": "^0.6.1"
     }
 }

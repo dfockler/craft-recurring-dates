@@ -1,7 +1,7 @@
 <?php
 namespace Craft;
 
-require('vendor/autoload.php');
+require("vendor/autoload.php");
 
 class RecurringDatePlugin extends BasePlugin
 {
@@ -10,28 +10,28 @@ class RecurringDatePlugin extends BasePlugin
 	{
 		parent::init();
     	
-		craft()->on('content.onSaveContent', function(Event $event) {
-			craft()->recurringDate->contentSaved($event->params['content'], $event->params['isNewContent']);
+		craft()->on("content.onSaveContent", function(Event $event) {
+			craft()->recurringDate->contentSaved($event->params["content"], $event->params["isNewContent"]);
 		});
 	}
 
 	function getName()
 	{
-		return Craft::t('Recurring Dates');
+		return Craft::t("Recurring Dates");
 	}
 
 	function getVersion()
 	{
-		return '0.3';
+		return "0.3";
 	}
 
 	function getDeveloper()
 	{
-		return 'NXNW';
+		return "Daniel Fockler";
 	}
 
 	function getDeveloperUrl()
 	{
-		return 'http://nxnw.net';
+		return "http://github.com/dfockler";
 	}
 }

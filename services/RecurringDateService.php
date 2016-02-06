@@ -238,36 +238,11 @@ class RecurringDateService extends BaseApplicationComponent
 		}
 
     	if($repeats){
-    		$rule = new Recurr\RecurrenceRule($rrule);
-			$ruleTransformer = new Recurr\RecurrenceRuleTransformer($rule, 300);
-			$dates = $ruleTransformer->getComputedArray();
+    		$rule = new Recurr\Rule($rrule);
+			$ruleTransformer = new Recurr\Transformer\ArrayTransformer();
+			$dates = $ruleTransformer->transform($rule);
 
-			if( !is_null($end) ){
-				$durationInterval = $start->diff($end);
-			}
-			else{
-				$durationInterval = $start->diff($start);
-			}
-
-			$fullDates = array();
-			foreach ($dates as $date) {
-				$end = clone $date;
-				$end = $end->add($durationInterval);
-
-				$startDateString = $date->format('Ymd\THis');
-				$endDateString = $end->format('Ymd\THis');
-				
-	    		
-				$datesValues['start'] = DateTime::createFromFormat('Ymd\THis', $startDateString, craft()->getTimeZone());
-
-				if( !empty($end) ){
-					$datesValues['end'] = DateTime::createFromFormat('Ymd\THis', $endDateString, craft()->getTimeZone());
-				}
-
-				$fullDates[] = $datesValues;
-	 		}
-
-	 		$finalDates = $fullDates;
+			$finalDates = $dates;
 		}
 		else{
 			$finalDates = array(array( 'start' => $start, 'end' => $end ));
@@ -277,8 +252,8 @@ class RecurringDateService extends BaseApplicationComponent
     		$dateRecord = new RecurringDate_DateRecord;
     		$dateRecord->setAttributes(array(
 	    		'ruleId' => $id,
-	    		'start' => $date['start'],
-	    		'end' => $date['end'],
+	    		'start' => $date->getStart(),
+	    		'end' => $date->getEnd(),
     		), false);
     		$dateRecord->save();
     	}
@@ -451,7 +426,7 @@ class RecurringDateService extends BaseApplicationComponent
 
 		//Builds RRULE based on UI Elements Input
 		if($repeats){
-			$rule = new Recurr\RecurrenceRule();
+			$rule = new Recurr\Rule();
 			$rule->setStartDate(DateTime::createFromString($startDate, craft()->getTimeZone()));
 			$rule->setInterval($interval);
 
@@ -464,11 +439,11 @@ class RecurringDateService extends BaseApplicationComponent
 
 			switch ($frequency) {
 				case 'daily':
-						$rule->setFreq(Recurr\RecurrenceRule::FREQ_DAILY);
+						$rule->setFreq(Recurr\Frequency::DAILY);
 					break;
 
 				case 'weekly':
-						$rule->setFreq(Recurr\RecurrenceRule::FREQ_WEEKLY);
+						$rule->setFreq(Recurr\Frequency::WEEKLY);
 						if( empty($weekDays) ){
 							//If weekdays empty set monday by default
 							$rule->setByDay(array('MO'));
@@ -479,7 +454,7 @@ class RecurringDateService extends BaseApplicationComponent
 					break;
 
 				case 'monthly':
-						$rule->setFreq(Recurr\RecurrenceRule::FREQ_MONTHLY);
+						$rule->setFreq(Recurr\Frequency::MONTHLY);
 						if( $repeatBy == 'month' ){
 							$dayOfMonth = date('j', $startDate);
 							$rule->setByMonthDay(array($dayOfMonth));
@@ -493,7 +468,7 @@ class RecurringDateService extends BaseApplicationComponent
 					break;
 
 				case 'yearly':
-						$rule->setFreq(Recurr\RecurrenceRule::FREQ_YEARLY);
+						$rule->setFreq(Recurr\Frequency::YEARLY);
 					break;
 			}
 
